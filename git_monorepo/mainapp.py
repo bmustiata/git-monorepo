@@ -1,59 +1,12 @@
 #!/usr/bin/env python3
 import os
-from typing import List, Set, Any, Dict
+import subprocess
+import sys
+from typing import Any, Dict
+from termcolor_util import yellow
 
 import click
-import sys
-import adhesive
 import yaml
-import shlex
-
-
-class Context:
-    repos: Dict[str, str]
-    project_dir: str
-    current_branch_name: str
-
-
-@adhesive.task("Read Current Branch")
-def read_current_branch(context: adhesive.Token[Context]) -> None:
-    print(f"Running in {context.data.project_dir}")
-    context.workspace.pwd = context.data.project_dir
-
-    context.data.current_branch_name = context.workspace.run_output("""
-        git rev-parse --abbrev-ref HEAD
-    """).strip()
-
-
-@adhesive.task("Read Configuration")
-def read_configuration(context: adhesive.Token[Context]) -> None:
-    context.workspace.pwd = context.data.project_dir
-
-    with open("gerepo.yml", "rt") as f:
-        config_data = yaml.safe_load(f)
-
-    context.data.repos = dict()
-    merge_repos(
-        path="",
-        repos=context.data.repos,
-        data=config_data["mappings"]
-    )
-
-
-@adhesive.task("Pull {loop.value} in {loop.key}")
-def pull_image_task(context: adhesive.Token[Context]) -> None:
-    if not os.path.isdir(context.loop.key):
-        context.workspace.run(f"""
-            cd {shlex.quote(context.data.project_dir)}
-            git subtree add -P {shlex.quote(context.loop.key)} {shlex.quote(context.loop.value)} master  
-        """)
-
-        return
-
-
-@adhesive.task("Push {loop.value} in {loop.key}")
-def push_image_task(context: adhesive.Token[Context]) -> None:
-    pass
 
 
 @click.group()
@@ -76,18 +29,30 @@ def help(command) -> None:
 
 @click.command("pull")
 def pull() -> None:
-    adhesive.process_start()\
-        .branch_start()\
-            .task("Read Current Branch")\
-        .branch_end()\
-        .branch_start()\
-            .task("Read Configuration")\
-        .branch_end()\
-        .task("Pull {loop.value} in {loop.key}", loop="repos")\
-        .process_end()\
-        .build(initial_data={
-        "project_dir": os.path.abspath(os.curdir),
-    })
+    with open("gerepo.yml", "rt") as f:
+        config_data = yaml.safe_load(f)
+
+    repos: Dict[str, str] = dict()
+    merge_repos(
+        path="",
+        repos=repos,
+        data=config_data["mappings"]
+    )
+
+    for folder_name, repo_location in repos.items():
+        print(yellow(repo_location, bold=True),
+              yellow("->"),
+              yellow(folder_name, bold=True),
+              )
+        if not os.path.isdir(folder_name):
+            subprocess.check_call([
+                "git", "subtree", "add", "-P", folder_name, repo_location, "master"
+            ])
+            continue
+
+        subprocess.check_call([
+            "git", "subtree", "pull", "-P", folder_name, repo_location, "master"
+        ])
 
 
 @click.command("push")
