@@ -1,11 +1,11 @@
-= git_monorepo
+= git-monorepo
 
-git_monorepo program.
+Monorepo support built around `git subtree`.
 
 == Installation
-
 
 [source,sh]
 -----------------------------------------------------------------------------
 pip install git_monorepo
 -----------------------------------------------------------------------------
+

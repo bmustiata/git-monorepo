@@ -15,7 +15,7 @@ setup(
     author_email="bogdan.mustiata@gmail.com",
     license="BSD",
     entry_points={
-        "console_scripts": ["git_monorepo = git_monorepo.mainapp:main"]
+        "console_scripts": ["git-mono = git_monorepo.mainapp:main"]
     },
     install_requires=[],
     packages=packages,
