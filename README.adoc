@@ -55,3 +55,14 @@ status named `.monorepo.sync` is created and committed automatically. This file
 holds a list of commits that were pushed, so you merges can also be dealed with
 correctly.
 
+=== mv
+
+WARN: this is not yet implementend
+
+[source,sh]
+-----------------------------------------------------------------------------
+git mv old/path new/path
+git subtree split --rejoin --prefix=new/path HEAD
+git subtree pull --squash --prefix=new/path giturl branch
+-----------------------------------------------------------------------------
+
