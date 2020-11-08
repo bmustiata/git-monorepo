@@ -8,7 +8,8 @@ from termcolor_util import yellow, red
 from git_monorepo.project_config import (
     read_config,
     get_current_commit,
-    write_synchronized_commits, is_synchronized_commits_file_existing,
+    write_synchronized_commits,
+    is_synchronized_commits_file_existing,
 )
 
 
@@ -69,7 +70,9 @@ def pull(folders: List[str]) -> None:
 
     current_commit = get_current_commit(project_folder=monorepo.project_folder)
 
-    if current_commit == initial_commit and is_synchronized_commits_file_existing(monorepo):
+    if current_commit == initial_commit and is_synchronized_commits_file_existing(
+        monorepo
+    ):
         return
 
     write_synchronized_commits(monorepo)

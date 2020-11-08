@@ -5,7 +5,8 @@ from termcolor_util import yellow, green
 from git_monorepo.project_config import (
     read_config,
     GitMonorepoConfig,
-    write_synchronized_commits, is_synchronized_commits_file_existing,
+    write_synchronized_commits,
+    is_synchronized_commits_file_existing,
 )
 
 
@@ -62,8 +63,8 @@ def is_repo_unchanged(monorepo: GitMonorepoConfig, folder_name: str) -> bool:
     # if no commits are synchronized, we need to mark this repo as changed
     # first, so the changes are being pushed
     if (
-        not monorepo.synchronized_commits or
-        folder_name not in monorepo.synchronized_commits
+        not monorepo.synchronized_commits
+        or folder_name not in monorepo.synchronized_commits
     ):
         return False
 
