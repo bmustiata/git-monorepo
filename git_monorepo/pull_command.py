@@ -38,7 +38,7 @@ def pull(folders: List[str]) -> None:
             yellow(folder_name, bold=True),
         )
 
-        if not os.path.isdir(folder_name):
+        if not os.path.isdir(os.path.join(monorepo.project_folder, folder_name)):
             subprocess.check_call(
                 [
                     "git",
