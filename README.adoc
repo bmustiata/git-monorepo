@@ -38,6 +38,13 @@ To pull the repos (including initial setup), use:
 git mono pull
 -----------------------------------------------------------------------------
 
+In case upstream changes happened in the remote repos, so a pull is required
+before the push, use the `--no-sync` flag, so it won't automatically merge and
+mark the changes as already synchronized to the remote repo.
+
+Implicity having a `pull` should be done on a clean repo, and a `pull
+--no-sync` if upstream changes are present.
+
 === push
 
 To push the repos do:
