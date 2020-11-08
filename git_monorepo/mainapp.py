@@ -12,7 +12,10 @@ def main():
     pass
 
 
+# define the pull command
+pull = click.argument("folders", nargs=-1)(pull)
 click_pull = click.command("pull")(pull)
+
 click_push = click.command("push")(push)
 
 
