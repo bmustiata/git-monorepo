@@ -43,12 +43,13 @@ also with branches.
 At the end of the operation, if something was pushed, a new file to
 track the status named `.monorepo.sync` is created and committed
 automatically. This file holds a list of commits that were pushed, so
-you merges can also be dealed with correctly.
+your merges can also be dealed with correctly, by adding both entries
+when solving a potential conflict for a project.
 
 mv
 --
 
-WARN: this is not yet implementend
+WARN: this is not yet implemented.
 
     git mv old/path new/path
     git subtree split --rejoin --prefix=new/path HEAD
