@@ -10,7 +10,8 @@ Installation
 Usage
 =====
 
-Simply create a mapping file called ``gerepo.yml``:
+Simply create a mapping file called ``monorepo.yml`` in the root of your
+git directory:
 
 .. code:: yaml
 
@@ -26,11 +27,17 @@ Simply create a mapping file called ``gerepo.yml``:
       tools:
         git-monorepo: git@github.com:bmustiata/git-monorepo.git
 
+pull
+----
+
 To pull the repos (including initial setup), use:
 
 .. code:: sh
 
     git mono pull
+
+push
+----
 
 To push the repos do:
 
@@ -40,3 +47,19 @@ To push the repos do:
 
 This takes into account the current branch name, so pushes can happen
 also with branches.
+
+At the end of the operation, if something was pushed, a new file to
+track the status named ``.monorepo.sync`` is created and committed
+automatically. This file holds a list of commits that were pushed, so
+you merges can also be dealed with correctly.
+
+mv
+--
+
+WARN: this is not yet implementend
+
+.. code:: sh
+
+    git mv old/path new/path
+    git subtree split --rejoin --prefix=new/path HEAD
+    git subtree pull --squash --prefix=new/path giturl branch
