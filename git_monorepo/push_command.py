@@ -5,7 +5,7 @@ from termcolor_util import yellow, green
 from git_monorepo.project_config import (
     read_config,
     GitMonorepoConfig,
-    write_synchronized_commits,
+    write_synchronized_commits, is_synchronized_commits_file_existing,
 )
 
 
@@ -44,11 +44,10 @@ def push():
             cwd=monorepo.project_folder,
         )
 
-    if not something_changed:
+    if not something_changed and is_synchronized_commits_file_existing(monorepo):
         return
 
     # we need to update the last commit file with the new value
-    monorepo.synchronized_commits = [get_current_commit(monorepo)]
     write_synchronized_commits(monorepo)
 
 
@@ -62,10 +61,13 @@ def is_repo_unchanged(monorepo: GitMonorepoConfig, folder_name: str) -> bool:
     """
     # if no commits are synchronized, we need to mark this repo as changed
     # first, so the changes are being pushed
-    if not monorepo.synchronized_commits:
+    if (
+        not monorepo.synchronized_commits or
+        folder_name not in monorepo.synchronized_commits
+    ):
         return False
 
-    for last_commit in monorepo.synchronized_commits:
+    for last_commit in monorepo.synchronized_commits[folder_name]:
         folder_log = (
             subprocess.check_output(
                 ["git", "log", f"{last_commit}..HEAD", "--", folder_name],
@@ -79,14 +81,3 @@ def is_repo_unchanged(monorepo: GitMonorepoConfig, folder_name: str) -> bool:
             return False
 
     return True
-
-
-def get_current_commit(monorepo: GitMonorepoConfig) -> str:
-    return (
-        subprocess.check_output(
-            ["git", "rev-parse", "HEAD"],
-            cwd=monorepo.project_folder,
-        )
-        .decode("utf-8")
-        .strip()
-    )

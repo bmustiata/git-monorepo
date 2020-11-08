@@ -13,7 +13,7 @@ class GitMonorepoConfig:
         *,
         repos: Dict[str, str],
         current_branch: str,
-        synchronized_commits: List[str],
+        synchronized_commits: Dict[str, List[str]],
         project_folder: str,
     ) -> None:
         # maps local folder to remote git repo location
@@ -69,6 +69,7 @@ def read_config() -> GitMonorepoConfig:
 
 
 def write_synchronized_commits(monorepo: GitMonorepoConfig):
+    monorepo.synchronized_commits = _create_synchronized_commits(monorepo)
     sync_file_name = os.path.join(monorepo.project_folder, ".monorepo.sync")
 
     print(yellow("Updating"), yellow(sync_file_name, bold=True))
@@ -91,11 +92,15 @@ def write_synchronized_commits(monorepo: GitMonorepoConfig):
     )
 
 
-def _read_synchronized_commits(project_folder: str) -> List[str]:
+def is_synchronized_commits_file_existing(monorepo: GitMonorepoConfig) -> bool:
+    return os.path.isfile(os.path.join(monorepo.project_folder, ".monorepo.sync"))
+
+
+def _read_synchronized_commits(project_folder: str) -> Dict[str, List[str]]:
     sync_file_name = os.path.join(project_folder, ".monorepo.sync")
 
     if not os.path.isfile(sync_file_name):
-        return []
+        return dict()
 
     with open(sync_file_name, "rt", encoding="utf-8") as f:
         return yaml.safe_load(f)
@@ -114,3 +119,26 @@ def _merge_repos(*, repos: Dict[str, str], path: str, data: Dict[str, Any]) -> N
             path=relative_path,
             data=key_value,
         )
+
+
+def _create_synchronized_commits(
+    monorepo: GitMonorepoConfig,
+) -> Dict[str, List[str]]:
+    result = dict()
+    current_commit = get_current_commit(project_folder=monorepo.project_folder)
+
+    for repo_folder in monorepo.repos:
+        result[repo_folder] = [current_commit]
+
+    return result
+
+
+def get_current_commit(*, project_folder: str) -> str:
+    return (
+        subprocess.check_output(
+            ["git", "rev-parse", "HEAD"],
+            cwd=project_folder,
+        )
+        .decode("utf-8")
+        .strip()
+    )
