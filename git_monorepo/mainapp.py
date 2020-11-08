@@ -17,7 +17,7 @@ def main():
 @click.command("help")
 @click.argument("command")
 def help(command) -> None:
-    with click.Context(main) as ctx:
+    with click.Context(main) as ctx:  # type: ignore
         if "pull" == command:
             click.echo(pull.get_help(ctx))
         elif "push" == command:
@@ -32,19 +32,28 @@ def pull() -> None:
     repos, current_branch = read_config()
 
     for folder_name, repo_location in repos.items():
-        print(yellow(repo_location, bold=True),
-              yellow("->"),
-              yellow(folder_name, bold=True),
-              )
+        print(
+            yellow(repo_location, bold=True),
+            yellow("->"),
+            yellow(folder_name, bold=True),
+        )
         if not os.path.isdir(folder_name):
-            subprocess.check_call([
-                "git", "subtree", "add", "-P", folder_name, repo_location, current_branch
-            ])
+            subprocess.check_call(
+                [
+                    "git",
+                    "subtree",
+                    "add",
+                    "-P",
+                    folder_name,
+                    repo_location,
+                    current_branch,
+                ]
+            )
             continue
 
-        subprocess.check_call([
-            "git", "subtree", "pull", "-P", folder_name, repo_location, current_branch
-        ])
+        subprocess.check_call(
+            ["git", "subtree", "pull", "-P", folder_name, repo_location, current_branch]
+        )
 
 
 @click.command("push")
@@ -52,30 +61,29 @@ def push() -> None:
     repos, current_branch = read_config()
 
     for folder_name, repo_location in repos.items():
-        print(yellow(repo_location, bold=True),
-              yellow("->"),
-              yellow(folder_name, bold=True),
-              )
-        subprocess.check_call([
-            "git", "subtree", "push", "-P", folder_name, repo_location, current_branch
-        ])
+        print(
+            yellow(repo_location, bold=True),
+            yellow("->"),
+            yellow(folder_name, bold=True),
+        )
+        subprocess.check_call(
+            ["git", "subtree", "push", "-P", folder_name, repo_location, current_branch]
+        )
 
 
 def read_config() -> Tuple[Dict[str, str], str]:
-    current_branch = subprocess.check_output([
-        "git", "rev-parse", "--abbrev-ref", "HEAD"
-    ]).decode(encoding="utf-8").strip()
+    current_branch = (
+        subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"])
+        .decode(encoding="utf-8")
+        .strip()
+    )
 
     with open("gerepo.yml", "rt") as f:
         config_data = yaml.safe_load(f)
 
     repos: Dict[str, str] = dict()
 
-    merge_repos(
-        path="",
-        repos=repos,
-        data=config_data["mappings"]
-    )
+    merge_repos(path="", repos=repos, data=config_data["mappings"])
 
     return repos, current_branch
 
@@ -85,7 +93,7 @@ main.add_command(push)
 main.add_command(help)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
 
 
