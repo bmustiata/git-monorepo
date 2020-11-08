@@ -14,6 +14,7 @@ def main():
 
 # define the pull command
 pull = click.argument("folders", nargs=-1)(pull)
+pull = click.option("--sync/--no-sync", default=True)(pull)
 click_pull = click.command("pull")(pull)
 
 click_push = click.command("push")(push)

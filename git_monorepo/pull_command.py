@@ -13,7 +13,7 @@ from git_monorepo.project_config import (
 )
 
 
-def pull(folders: List[str]) -> None:
+def pull(sync: bool, folders: List[str]) -> None:
     monorepo = read_config()
 
     pull_folders = set(folders)
@@ -33,13 +33,15 @@ def pull(folders: List[str]) -> None:
         if folders and not folder_name in folders:
             continue
 
+        absolute_folder_name = os.path.join(monorepo.project_folder, folder_name)
+
         print(
             yellow(repo_location, bold=True),
             yellow("->"),
-            yellow(folder_name, bold=True),
+            yellow(absolute_folder_name, bold=True),
         )
 
-        if not os.path.isdir(os.path.join(monorepo.project_folder, folder_name)):
+        if not os.path.isdir(absolute_folder_name):
             subprocess.check_call(
                 [
                     "git",
@@ -73,6 +75,10 @@ def pull(folders: List[str]) -> None:
     if current_commit == initial_commit and is_synchronized_commits_file_existing(
         monorepo
     ):
+        return
+
+    if not sync:
+        print(yellow("Not syncing as requested"))
         return
 
     write_synchronized_commits(monorepo)
