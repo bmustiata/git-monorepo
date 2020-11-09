@@ -65,10 +65,14 @@ when solving a potential conflict for a project.
 mv
 --
 
-WARN: this is not yet implemented.
+This renames the entry in the synchronized commits, and does the
+equivalent of:
 
 .. code:: sh
 
     git mv old/path new/path
     git subtree split --rejoin --prefix=new/path HEAD
     git subtree pull --squash --prefix=new/path giturl branch
+
+WARN: You still need to manually update the ``monorepo.yml`` manually
+with the new location.

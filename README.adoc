@@ -65,7 +65,7 @@ project.
 
 === mv
 
-WARN: this is not yet implemented.
+This renames the entry in the synchronized commits, and does the equivalent of:
 
 [source,sh]
 -----------------------------------------------------------------------------
@@ -74,3 +74,5 @@ git subtree split --rejoin --prefix=new/path HEAD
 git subtree pull --squash --prefix=new/path giturl branch
 -----------------------------------------------------------------------------
 
+WARN: You still need to manually update the `monorepo.yml` manually with the
+new location.
