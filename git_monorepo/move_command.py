@@ -44,10 +44,12 @@ def move(old_path: str, new_path: str) -> None:
     subprocess.check_call(
         ["git", "mv", old_path, new_path], cwd=monorepo.project_folder
     )
+
     subprocess.check_call(
         ["git", "commit", "-m", f"git-monorepo: move {old_path} -> {new_path}"],
         cwd=monorepo.project_folder,
     )
+
     subprocess.check_call(
         ["git", "subtree", "split", "--rejoin", f"--prefix={new_path}", "HEAD"],
         cwd=monorepo.project_folder,
@@ -58,6 +60,7 @@ def move(old_path: str, new_path: str) -> None:
             }
         ),
     )
+
     subprocess.check_call(
         [
             "git",
@@ -80,7 +83,8 @@ def move(old_path: str, new_path: str) -> None:
     monorepo.repos[new_path] = monorepo.repos[old_path]
     del monorepo.repos[old_path]
 
-    write_synchronized_commits(monorepo)
+    # FIXME: probably wrong location
+    write_synchronized_commits(monorepo, repo=new_path)
 
     print(
         "⚠️ ⚠️ ⚠️ ",

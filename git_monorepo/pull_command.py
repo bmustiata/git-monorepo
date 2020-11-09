@@ -31,8 +31,6 @@ def pull(sync: bool, folders: List[str]) -> None:
         )
         sys.exit(1)
 
-    initial_commit = get_current_commit(project_folder=monorepo.project_folder)
-
     for folder_name, repo_location in monorepo.repos.items():
         if folders and not folder_name in folders:
             continue
@@ -44,6 +42,8 @@ def pull(sync: bool, folders: List[str]) -> None:
             yellow("->"),
             yellow(absolute_folder_name, bold=True),
         )
+
+        initial_commit = get_current_commit(project_folder=monorepo.project_folder)
 
         if not os.path.isdir(absolute_folder_name):
             subprocess.check_call(
@@ -64,40 +64,38 @@ def pull(sync: bool, folders: List[str]) -> None:
                     }
                 ),
             )
+        else:
+            subprocess.check_call(
+                [
+                    "git",
+                    "subtree",
+                    "pull",
+                    "-P",
+                    folder_name,
+                    repo_location,
+                    monorepo.current_branch,
+                ],
+                cwd=monorepo.project_folder,
+                env=env_extend(
+                    {
+                        "EDITOR": "git-monorepo-editor",
+                        "GIT_MONOREPO_EDITOR_MESSAGE": f"git-monorepo: Sync {folder_name}",
+                    }
+                ),
+            )
 
+        current_commit = get_current_commit(project_folder=monorepo.project_folder)
+
+        if current_commit == initial_commit and is_synchronized_commits_file_existing(
+            monorepo, repo=folder_name
+        ):
             continue
 
-        subprocess.check_call(
-            [
-                "git",
-                "subtree",
-                "pull",
-                "-P",
-                folder_name,
-                repo_location,
-                monorepo.current_branch,
-            ],
-            cwd=monorepo.project_folder,
-            env=env_extend(
-                {
-                    "EDITOR": "git-monorepo-editor",
-                    "GIT_MONOREPO_EDITOR_MESSAGE": f"git-monorepo: Sync {folder_name}",
-                }
-            ),
-        )
+        if not sync:
+            print(yellow("Not syncing as requested"))
+            continue
 
-    current_commit = get_current_commit(project_folder=monorepo.project_folder)
-
-    if current_commit == initial_commit and is_synchronized_commits_file_existing(
-        monorepo
-    ):
-        return
-
-    if not sync:
-        print(yellow("Not syncing as requested"))
-        return
-
-    write_synchronized_commits(monorepo)
+        write_synchronized_commits(monorepo, repo=folder_name)
 
 
 def env_extend(extra_env: Dict[str, str]) -> Dict[str, str]:

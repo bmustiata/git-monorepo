@@ -1,7 +1,7 @@
 import os
 import subprocess
 import sys
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 import yaml
 from termcolor_util import red, yellow
@@ -71,11 +71,13 @@ def read_config() -> GitMonorepoConfig:
     )
 
 
-def write_synchronized_commits(monorepo: GitMonorepoConfig):
-    monorepo.synchronized_commits = _create_synchronized_commits(monorepo)
+def write_synchronized_commits(
+        monorepo: GitMonorepoConfig,
+        repo: Optional[str] = None):
     sync_file_name = os.path.join(monorepo.project_folder, MONOREPO_SYNC_FILE)
 
-    print(yellow("Updating"), yellow(sync_file_name, bold=True))
+    monorepo.synchronized_commits[repo] = [get_current_commit(project_folder=monorepo.project_folder)]
+    print(yellow("Updating"), yellow(sync_file_name, bold=True), yellow("for"), yellow(repo, bold=True))
 
     with open(sync_file_name, "wt", encoding="utf-8") as f:
         yaml.safe_dump(monorepo.synchronized_commits, f)
@@ -84,19 +86,34 @@ def write_synchronized_commits(monorepo: GitMonorepoConfig):
         ["git", "add", sync_file_name],
         cwd=monorepo.project_folder,
     )
+
     subprocess.check_call(
         [
             "git",
             "commit",
             "-m",
-            f"git-monorepo: Sync commit hashes in {MONOREPO_SYNC_FILE}",
+            f"git-monorepo: Sync commit hashes in {MONOREPO_SYNC_FILE} for {repo}",
         ],
         cwd=monorepo.project_folder,
     )
 
 
-def is_synchronized_commits_file_existing(monorepo: GitMonorepoConfig) -> bool:
-    return os.path.isfile(os.path.join(monorepo.project_folder, MONOREPO_SYNC_FILE))
+def is_synchronized_commits_file_existing(
+        monorepo: GitMonorepoConfig,
+        repo: Optional[str] = None,
+    ) -> bool:
+    sync_file_path = os.path.join(monorepo.project_folder, MONOREPO_SYNC_FILE)
+    is_file = os.path.isfile(sync_file_path)
+
+    if not is_file:
+        return False
+
+    if not repo:
+        return True
+
+    with open(sync_file_path, "rt", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+        return repo in data
 
 
 def _read_synchronized_commits(project_folder: str) -> Dict[str, List[str]]:

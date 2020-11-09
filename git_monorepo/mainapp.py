@@ -19,6 +19,7 @@ pull = click.option("--sync/--no-sync", default=True)(pull)
 click_pull = click.command("pull")(pull)
 
 # define the push command
+push = click.option("--force/--no-force", "-f", default=False)(push)
 click_push = click.command("push")(push)
 
 # define the move command
