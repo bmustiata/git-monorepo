@@ -11,6 +11,7 @@ from git_monorepo.project_config import (
     write_synchronized_commits,
     GitMonorepoConfig,
 )
+from git_monorepo.pull_command import env_extend
 
 
 def move(old_path: str, new_path: str) -> None:
@@ -51,6 +52,10 @@ def move(old_path: str, new_path: str) -> None:
     subprocess.check_call(
         ["git", "subtree", "split", "--rejoin", f"--prefix={new_path}", "HEAD"],
         cwd=monorepo.project_folder,
+        env=env_extend({
+            "EDITOR": "git-monorepo-editor",
+            "GIT_MONOREPO_EDITOR_MESSAGE": f"git-monorepo: Sync {new_path}",
+        }),
     )
     subprocess.check_call(
         [
@@ -63,6 +68,10 @@ def move(old_path: str, new_path: str) -> None:
             monorepo.current_branch,
         ],
         cwd=monorepo.project_folder,
+        env=env_extend({
+            "EDITOR": "git-monorepo-editor",
+            "GIT_MONOREPO_EDITOR_MESSAGE": f"git-monorepo: Sync {new_path}",
+        }),
     )
 
     monorepo.repos[new_path] = monorepo.repos[old_path]

@@ -89,7 +89,7 @@ def write_synchronized_commits(monorepo: GitMonorepoConfig):
             "git",
             "commit",
             "-m",
-            f"git-monorepo: sync commits",
+            f"git-monorepo: Sync commit hashes",
         ],
         cwd=monorepo.project_folder,
     )

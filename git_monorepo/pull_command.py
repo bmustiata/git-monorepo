@@ -1,7 +1,7 @@
 import os
 import subprocess
 import sys
-from typing import List
+from typing import List, Dict
 
 from termcolor_util import yellow, red
 
@@ -53,9 +53,10 @@ def pull(sync: bool, folders: List[str]) -> None:
                     monorepo.current_branch,
                 ],
                 cwd=monorepo.project_folder,
-                env={
+                env=env_extend({
                     "EDITOR": "git-monorepo-editor",
-                }
+                    "GIT_MONOREPO_EDITOR_MESSAGE": f"git-monorepo: Sync {folder_name}",
+                })
             )
 
             continue
@@ -71,9 +72,10 @@ def pull(sync: bool, folders: List[str]) -> None:
                 monorepo.current_branch,
             ],
             cwd=monorepo.project_folder,
-            env={
+            env=env_extend({
                 "EDITOR": "git-monorepo-editor",
-            }
+                "GIT_MONOREPO_EDITOR_MESSAGE": f"git-monorepo: Sync {folder_name}",
+            })
         )
 
     current_commit = get_current_commit(project_folder=monorepo.project_folder)
@@ -88,3 +90,10 @@ def pull(sync: bool, folders: List[str]) -> None:
         return
 
     write_synchronized_commits(monorepo)
+
+
+def env_extend(extra_env: Dict[str, str]) -> Dict[str, str]:
+    result = dict(os.environ)
+    result.update(extra_env)
+
+    return result
