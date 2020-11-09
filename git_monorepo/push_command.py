@@ -60,7 +60,8 @@ def push(force: bool):
             continue
 
         # we need to update the last commit file with the new value
-        write_synchronized_commits(monorepo, repo=folder_name)
+        # the commit is the current_commit, since this is already pushed
+        write_synchronized_commits(monorepo, repo=folder_name, commit=current_commit)
 
 
 def is_repo_unchanged(monorepo: GitMonorepoConfig, folder_name: str) -> bool:

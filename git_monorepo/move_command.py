@@ -83,7 +83,7 @@ def move(old_path: str, new_path: str) -> None:
     monorepo.repos[new_path] = monorepo.repos[old_path]
     del monorepo.repos[old_path]
 
-    # FIXME: probably wrong location
+    # FIXME: probably wrong location, and wrong commit
     write_synchronized_commits(monorepo, repo=new_path)
 
     print(

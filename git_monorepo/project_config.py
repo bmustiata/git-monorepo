@@ -73,10 +73,13 @@ def read_config() -> GitMonorepoConfig:
 
 def write_synchronized_commits(
         monorepo: GitMonorepoConfig,
-        repo: Optional[str] = None):
+        repo: Optional[str] = None,
+        commit: Optional[str] = None) -> None:
     sync_file_name = os.path.join(monorepo.project_folder, MONOREPO_SYNC_FILE)
 
-    monorepo.synchronized_commits[repo] = [get_current_commit(project_folder=monorepo.project_folder)]
+    commit = commit if commit else get_current_commit(project_folder=monorepo.project_folder)
+    monorepo.synchronized_commits[repo] = [commit]
+
     print(yellow("Updating"), yellow(sync_file_name, bold=True), yellow("for"), yellow(repo, bold=True))
 
     with open(sync_file_name, "wt", encoding="utf-8") as f:

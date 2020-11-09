@@ -95,7 +95,7 @@ def pull(sync: bool, folders: List[str]) -> None:
             print(yellow("Not syncing as requested"))
             continue
 
-        write_synchronized_commits(monorepo, repo=folder_name)
+        write_synchronized_commits(monorepo, repo=folder_name, commit=initial_commit)
 
 
 def env_extend(extra_env: Dict[str, str]) -> Dict[str, str]:
