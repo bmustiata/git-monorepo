@@ -6,7 +6,8 @@ from git_monorepo.project_config import (
     read_config,
     GitMonorepoConfig,
     write_synchronized_commits,
-    is_synchronized_commits_file_existing, get_current_commit,
+    is_synchronized_commits_file_existing,
+    get_current_commit,
 )
 from git_monorepo.pull_command import env_extend
 
@@ -53,11 +54,6 @@ def push(force: bool):
         )
 
         current_commit = get_current_commit(project_folder=monorepo.project_folder)
-
-        if current_commit == initial_commit and is_synchronized_commits_file_existing(
-            monorepo, repo=folder_name
-        ):
-            continue
 
         # we need to update the last commit file with the new value
         # the commit is the current_commit, since this is already pushed
