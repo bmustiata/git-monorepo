@@ -77,4 +77,4 @@ git subtree pull --squash --prefix=new/path giturl branch
 WARN: You still need to manually update the `monorepo.yml` manually with the
 new location.
 
-.
+.,
