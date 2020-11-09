@@ -44,10 +44,12 @@ def push():
                 monorepo.current_branch,
             ],
             cwd=monorepo.project_folder,
-            env=env_extend({
-                "EDITOR": "git-monorepo-editor",
-                "GIT_MONOREPO_EDITOR_MESSAGE": f"git-monorepo: Sync {folder_name}",
-            })
+            env=env_extend(
+                {
+                    "EDITOR": "git-monorepo-editor",
+                    "GIT_MONOREPO_EDITOR_MESSAGE": f"git-monorepo: Sync {folder_name}",
+                }
+            ),
         )
 
     if not something_changed and is_synchronized_commits_file_existing(monorepo):

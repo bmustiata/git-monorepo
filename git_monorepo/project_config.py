@@ -89,7 +89,7 @@ def write_synchronized_commits(monorepo: GitMonorepoConfig):
             "git",
             "commit",
             "-m",
-            f"git-monorepo: Sync commit hashes",
+            f"git-monorepo: Sync commit hashes in {MONOREPO_SYNC_FILE}",
         ],
         cwd=monorepo.project_folder,
     )
@@ -145,3 +145,22 @@ def get_current_commit(*, project_folder: str) -> str:
         .decode("utf-8")
         .strip()
     )
+
+
+def _resolve_in_repo(monorepo: GitMonorepoConfig, path: str) -> str:
+    """
+    Resolves a path inside the monorepo, to allow working inside folders
+    """
+    absolute_path = os.path.abspath(path)
+
+    if not absolute_path.startswith(monorepo.project_folder):
+        print(
+            red(path, bold=True),
+            red("resolved to"),
+            red(absolute_path, bold=True),
+            red("was not in the project folder:"),
+            red(monorepo.project_folder, bold=True),
+        )
+        sys.exit(1)
+
+    return os.path.relpath(absolute_path, monorepo.project_folder)

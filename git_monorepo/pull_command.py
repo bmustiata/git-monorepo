@@ -10,11 +10,15 @@ from git_monorepo.project_config import (
     get_current_commit,
     write_synchronized_commits,
     is_synchronized_commits_file_existing,
+    _resolve_in_repo,
 )
 
 
 def pull(sync: bool, folders: List[str]) -> None:
     monorepo = read_config()
+
+    # we normalize relative paths, extra slashes, etc
+    folders = [_resolve_in_repo(monorepo, it) for it in folders]
 
     pull_folders = set(folders)
     pull_folders.difference_update(monorepo.repos)
@@ -53,10 +57,12 @@ def pull(sync: bool, folders: List[str]) -> None:
                     monorepo.current_branch,
                 ],
                 cwd=monorepo.project_folder,
-                env=env_extend({
-                    "EDITOR": "git-monorepo-editor",
-                    "GIT_MONOREPO_EDITOR_MESSAGE": f"git-monorepo: Sync {folder_name}",
-                })
+                env=env_extend(
+                    {
+                        "EDITOR": "git-monorepo-editor",
+                        "GIT_MONOREPO_EDITOR_MESSAGE": f"git-monorepo: Sync {folder_name}",
+                    }
+                ),
             )
 
             continue
@@ -72,10 +78,12 @@ def pull(sync: bool, folders: List[str]) -> None:
                 monorepo.current_branch,
             ],
             cwd=monorepo.project_folder,
-            env=env_extend({
-                "EDITOR": "git-monorepo-editor",
-                "GIT_MONOREPO_EDITOR_MESSAGE": f"git-monorepo: Sync {folder_name}",
-            })
+            env=env_extend(
+                {
+                    "EDITOR": "git-monorepo-editor",
+                    "GIT_MONOREPO_EDITOR_MESSAGE": f"git-monorepo: Sync {folder_name}",
+                }
+            ),
         )
 
     current_commit = get_current_commit(project_folder=monorepo.project_folder)

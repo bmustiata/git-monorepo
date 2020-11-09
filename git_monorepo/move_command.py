@@ -1,5 +1,4 @@
 import os
-import shutil
 import subprocess
 import sys
 
@@ -9,7 +8,7 @@ from git_monorepo.project_config import (
     read_config,
     MONOREPO_CONFIG_FILE,
     write_synchronized_commits,
-    GitMonorepoConfig,
+    _resolve_in_repo,
 )
 from git_monorepo.pull_command import env_extend
 
@@ -52,10 +51,12 @@ def move(old_path: str, new_path: str) -> None:
     subprocess.check_call(
         ["git", "subtree", "split", "--rejoin", f"--prefix={new_path}", "HEAD"],
         cwd=monorepo.project_folder,
-        env=env_extend({
-            "EDITOR": "git-monorepo-editor",
-            "GIT_MONOREPO_EDITOR_MESSAGE": f"git-monorepo: Sync {new_path}",
-        }),
+        env=env_extend(
+            {
+                "EDITOR": "git-monorepo-editor",
+                "GIT_MONOREPO_EDITOR_MESSAGE": f"git-monorepo: Sync {new_path}",
+            }
+        ),
     )
     subprocess.check_call(
         [
@@ -68,10 +69,12 @@ def move(old_path: str, new_path: str) -> None:
             monorepo.current_branch,
         ],
         cwd=monorepo.project_folder,
-        env=env_extend({
-            "EDITOR": "git-monorepo-editor",
-            "GIT_MONOREPO_EDITOR_MESSAGE": f"git-monorepo: Sync {new_path}",
-        }),
+        env=env_extend(
+            {
+                "EDITOR": "git-monorepo-editor",
+                "GIT_MONOREPO_EDITOR_MESSAGE": f"git-monorepo: Sync {new_path}",
+            }
+        ),
     )
 
     monorepo.repos[new_path] = monorepo.repos[old_path]
@@ -87,22 +90,3 @@ def move(old_path: str, new_path: str) -> None:
         yellow(MONOREPO_CONFIG_FILE, bold=True),
         yellow("with the new location, and remove the old entry"),
     )
-
-
-def _resolve_in_repo(monorepo: GitMonorepoConfig, path: str) -> str:
-    """
-    Resolves a path inside the monorepo, to allow working inside folders
-    """
-    absolute_path = os.path.abspath(path)
-
-    if not absolute_path.startswith(monorepo.project_folder):
-        print(
-            red(path, bold=True),
-            red("resolved to"),
-            red(absolute_path, bold=True),
-            red("was not in the project folder:"),
-            red(monorepo.project_folder, bold=True),
-        )
-        sys.exit(1)
-
-    return os.path.relpath(absolute_path, monorepo.project_folder)
