@@ -3,6 +3,7 @@ import sys
 
 import click
 
+from git_monorepo.move_command import move
 from git_monorepo.pull_command import pull
 from git_monorepo.push_command import push
 
@@ -17,7 +18,13 @@ pull = click.argument("folders", nargs=-1)(pull)
 pull = click.option("--sync/--no-sync", default=True)(pull)
 click_pull = click.command("pull")(pull)
 
+# define the push command
 click_push = click.command("push")(push)
+
+# define the move command
+move = click.argument("new_path")(move)
+move = click.argument("old_path")(move)
+click_move = click.command("mv")(move)
 
 
 @click.command("help")
@@ -35,6 +42,7 @@ def help(command) -> None:
 
 main.add_command(click_pull)
 main.add_command(click_push)
+main.add_command(click_move)
 main.add_command(help)
 
 

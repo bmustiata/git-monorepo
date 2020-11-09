@@ -6,6 +6,9 @@ from typing import Dict, Any, List
 import yaml
 from termcolor_util import red, yellow
 
+MONOREPO_CONFIG_FILE = "monorepo.yml"
+MONOREPO_SYNC_FILE = ".monorepo.sync"
+
 
 class GitMonorepoConfig:
     def __init__(
@@ -26,14 +29,14 @@ class GitMonorepoConfig:
 def read_config() -> GitMonorepoConfig:
     monorepo_config_folder = os.path.abspath(os.curdir)
     while monorepo_config_folder and not os.path.isfile(
-        os.path.join(monorepo_config_folder, "monorepo.yml")
+        os.path.join(monorepo_config_folder, MONOREPO_CONFIG_FILE)
     ):
         parent_folder = os.path.dirname(monorepo_config_folder)
 
         if parent_folder == monorepo_config_folder:
             print(
                 red("Unable to find"),
-                red("monorepo.yml", bold=True),
+                red(MONOREPO_CONFIG_FILE, bold=True),
                 red("in any of the parents from"),
                 red(os.path.abspath(os.curdir), bold=True),
             )
@@ -51,7 +54,7 @@ def read_config() -> GitMonorepoConfig:
         .strip()
     )
 
-    config_file_name = os.path.join(project_folder, "monorepo.yml")
+    config_file_name = os.path.join(project_folder, MONOREPO_CONFIG_FILE)
     with open(config_file_name, "rt") as f:
         config_data = yaml.safe_load(f)
 
@@ -70,7 +73,7 @@ def read_config() -> GitMonorepoConfig:
 
 def write_synchronized_commits(monorepo: GitMonorepoConfig):
     monorepo.synchronized_commits = _create_synchronized_commits(monorepo)
-    sync_file_name = os.path.join(monorepo.project_folder, ".monorepo.sync")
+    sync_file_name = os.path.join(monorepo.project_folder, MONOREPO_SYNC_FILE)
 
     print(yellow("Updating"), yellow(sync_file_name, bold=True))
 
@@ -93,11 +96,11 @@ def write_synchronized_commits(monorepo: GitMonorepoConfig):
 
 
 def is_synchronized_commits_file_existing(monorepo: GitMonorepoConfig) -> bool:
-    return os.path.isfile(os.path.join(monorepo.project_folder, ".monorepo.sync"))
+    return os.path.isfile(os.path.join(monorepo.project_folder, MONOREPO_SYNC_FILE))
 
 
 def _read_synchronized_commits(project_folder: str) -> Dict[str, List[str]]:
-    sync_file_name = os.path.join(project_folder, ".monorepo.sync")
+    sync_file_name = os.path.join(project_folder, MONOREPO_SYNC_FILE)
 
     if not os.path.isfile(sync_file_name):
         return dict()
