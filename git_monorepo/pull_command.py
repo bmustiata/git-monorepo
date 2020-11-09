@@ -53,6 +53,9 @@ def pull(sync: bool, folders: List[str]) -> None:
                     monorepo.current_branch,
                 ],
                 cwd=monorepo.project_folder,
+                env={
+                    "EDITOR": "git-monorepo-editor",
+                }
             )
 
             continue
@@ -68,6 +71,9 @@ def pull(sync: bool, folders: List[str]) -> None:
                 monorepo.current_branch,
             ],
             cwd=monorepo.project_folder,
+            env={
+                "EDITOR": "git-monorepo-editor",
+            }
         )
 
     current_commit = get_current_commit(project_folder=monorepo.project_folder)
