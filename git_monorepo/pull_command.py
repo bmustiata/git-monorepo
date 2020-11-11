@@ -3,7 +3,7 @@ import subprocess
 import sys
 from typing import List
 
-from termcolor_util import yellow, red
+from termcolor_util import yellow, red, green
 
 from git_monorepo.git_monorepo_config import (
     read_monorepo_config,
@@ -25,7 +25,7 @@ def pull(
     monorepo = read_monorepo_config()
 
     folders = get_folders_to_update(monorepo, folders, required)
-    validate_folders_to_update(monorepo, folders)
+    validate_folders_to_update(monorepo, folders, required)
 
     for folder_name, repo_location in monorepo.repos.items():
         if folders and not folder_name in folders:
@@ -112,7 +112,9 @@ def add_monorepo_project(
     )
 
 
-def validate_folders_to_update(monorepo: GitMonorepoConfig, folders: List[str]) -> None:
+def validate_folders_to_update(
+    monorepo: GitMonorepoConfig, folders: List[str], required: bool
+) -> None:
     pull_folders = set(folders)
     pull_folders.difference_update(monorepo.repos)
     if pull_folders:
@@ -122,6 +124,10 @@ def validate_folders_to_update(monorepo: GitMonorepoConfig, folders: List[str]) 
             red("not found in monorepo projects."),
         )
         sys.exit(1)
+
+    if not folders and required:
+        print(green("Nothing changed locally.", bold=True), green("Nothing to do."))
+        sys.exit(0)
 
 
 def get_folders_to_update(
