@@ -26,7 +26,7 @@ class GitMonorepoConfig:
         self.project_folder = project_folder
 
 
-def read_config() -> GitMonorepoConfig:
+def read_monorepo_config() -> GitMonorepoConfig:
     monorepo_config_folder = os.path.abspath(os.curdir)
     while monorepo_config_folder and not os.path.isfile(
         os.path.join(monorepo_config_folder, MONOREPO_CONFIG_FILE)
@@ -72,13 +72,16 @@ def read_config() -> GitMonorepoConfig:
 
 
 def write_synchronized_commits(
-    monorepo: GitMonorepoConfig, repo: str, commit: Optional[str] = None
+    monorepo: GitMonorepoConfig,
+    repo: str,
+    commit: Optional[str] = None,
 ) -> None:
     sync_file_name = os.path.join(monorepo.project_folder, MONOREPO_SYNC_FILE)
 
     commit = (
         commit if commit else get_current_commit(project_folder=monorepo.project_folder)
     )
+
     monorepo.synchronized_commits[repo] = [commit]
 
     print(

@@ -3,7 +3,7 @@ import subprocess
 from termcolor_util import yellow, green
 
 from git_monorepo.git_monorepo_config import (
-    read_config,
+    read_monorepo_config,
     write_synchronized_commits,
     get_current_commit,
 )
@@ -12,7 +12,7 @@ from git_monorepo.pull_command import env_extend
 
 
 def push(resync: bool):
-    monorepo = read_config()
+    monorepo = read_monorepo_config()
 
     for folder_name, repo_location in monorepo.repos.items():
         if is_repo_unchanged(monorepo, folder_name) and not resync:
@@ -32,28 +32,31 @@ def push(resync: bool):
         )
 
         initial_commit = get_current_commit(project_folder=monorepo.project_folder)
+        push_monorepo_project(monorepo, folder_name, repo_location)
 
-        subprocess.check_call(
-            [
-                "git",
-                "subtree",
-                "push",
-                "-P",
-                folder_name,
-                repo_location,
-                monorepo.current_branch,
-            ],
-            cwd=monorepo.project_folder,
-            env=env_extend(
-                {
-                    "EDITOR": "git-monorepo-editor",
-                    "GIT_MONOREPO_EDITOR_MESSAGE": f"git-monorepo: push {folder_name}",
-                }
-            ),
-        )
+        current_commit = get_current_commit(project_folder=monorepo.project_folder)
 
-    current_commit = get_current_commit(project_folder=monorepo.project_folder)
+        # we need to update the last commit file with the new value
+        # the commit is the current_commit, since this is already pushed
+        write_synchronized_commits(monorepo, repo=folder_name, commit=current_commit)
 
-    # we need to update the last commit file with the new value
-    # the commit is the current_commit, since this is already pushed
-    write_synchronized_commits(monorepo, repo=folder_name, commit=current_commit)
+
+def push_monorepo_project(monorepo, folder_name, repo_location):
+    subprocess.check_call(
+        [
+            "git",
+            "subtree",
+            "push",
+            "-P",
+            folder_name,
+            repo_location,
+            monorepo.current_branch,
+        ],
+        cwd=monorepo.project_folder,
+        env=env_extend(
+            {
+                "EDITOR": "git-monorepo-editor",
+                "GIT_MONOREPO_EDITOR_MESSAGE": f"git-monorepo: push {folder_name}",
+            }
+        ),
+    )

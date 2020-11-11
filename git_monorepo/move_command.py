@@ -5,7 +5,7 @@ import sys
 from termcolor_util import red, yellow, cyan
 
 from git_monorepo.git_monorepo_config import (
-    read_config,
+    read_monorepo_config,
     MONOREPO_CONFIG_FILE,
     write_synchronized_commits,
     _resolve_in_repo,
@@ -19,7 +19,7 @@ def move(old_path: str, new_path: str) -> None:
     git subtree split --rejoin --prefix=new/path HEAD
     git subtree pull --squash --prefix=new/path giturl branch
     """
-    monorepo = read_config()
+    monorepo = read_monorepo_config()
 
     old_path = _resolve_in_repo(monorepo, old_path)
     new_path = _resolve_in_repo(monorepo, new_path)
