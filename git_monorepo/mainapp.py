@@ -15,11 +15,22 @@ def main():
 
 # define the pull command
 pull = click.argument("folders", nargs=-1)(pull)
-pull = click.option("--sync/--no-sync", default=True)(pull)
+pull = click.option(
+    "--sync/--no-sync", default=True, help="Update the .monorepo.sync file"
+)(pull)
+pull = click.option(
+    "--required/--no-required",
+    default=False,
+    help="Pull only repos that have changes from upstream",
+)(pull)
 click_pull = click.command("pull")(pull)
 
 # define the push command
-push = click.option("--force/--no-force", "-f", default=False)(push)
+push = click.option(
+    "--resync/--no-resync",
+    default=False,
+    help="Push all repos even if .monorepo.sync says they're not changed",
+)(push)
 click_push = click.command("push")(push)
 
 # define the move command

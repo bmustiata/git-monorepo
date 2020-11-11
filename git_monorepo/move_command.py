@@ -4,13 +4,13 @@ import sys
 
 from termcolor_util import red, yellow, cyan
 
-from git_monorepo.project_config import (
+from git_monorepo.git_monorepo_config import (
     read_config,
     MONOREPO_CONFIG_FILE,
     write_synchronized_commits,
     _resolve_in_repo,
 )
-from git_monorepo.pull_command import env_extend
+from git_monorepo.git_util import env_extend
 
 
 def move(old_path: str, new_path: str) -> None:
