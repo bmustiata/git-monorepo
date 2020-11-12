@@ -42,13 +42,15 @@ Squash Commits
 --------------
 
 `subtree` creates the commits, including merges into the upstream repos.
-This could severely pollute the history of the upstream repos. To squash
-the history into single commits, enable squashing commits via the
-`squash` property:
+This could severely pollute the history of the upstream repos. Because
+of this reason, squashing is implicitly enabled.
+
+To disable squash the history into single commits, set the `squash`
+property:
 
     mappings:
       # ...
-    squash: true
+    squash: false
 
 pull
 ----

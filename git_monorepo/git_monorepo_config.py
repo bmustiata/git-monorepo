@@ -59,7 +59,7 @@ def read_monorepo_config() -> GitMonorepoConfig:
     else:
         current_branch = get_current_git_branch(project_folder)
 
-    squash = config_data.get("squash", False)
+    squash = config_data.get("squash", True)
 
     synchronized_commits = _read_synchronized_commits(project_folder)
 
