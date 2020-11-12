@@ -29,6 +29,18 @@ mappings:
     git-monorepo: git@github.com:bmustiata/git-monorepo.git
 -----------------------------------------------------------------------------
 
+If you want to use a different branch name in all the remote repositories
+instead of the same name as the local branch, specify it as such:
+
+[source,yaml]
+-----------------------------------------------------------------------------
+mappings:
+  # ...
+branch: master
+-----------------------------------------------------------------------------
+
+NOTE: This branch name applies for both pulling _and_ pushing.
+
 === pull
 
 To pull the repos (including initial setup), use:
@@ -74,7 +86,7 @@ git subtree split --rejoin --prefix=new/path HEAD
 git subtree pull --squash --prefix=new/path giturl branch
 -----------------------------------------------------------------------------
 
-WARN: You still need to manually update the `monorepo.yml` manually with the
+NOTE: You still need to manually update the `monorepo.yml` manually with the
 new location.
 
-.,
+NOTE: The feature is currently deemed unstable.

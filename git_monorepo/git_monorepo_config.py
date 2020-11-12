@@ -6,6 +6,8 @@ from typing import Dict, Any, List, Optional
 import yaml
 from termcolor_util import red, yellow
 
+from git_monorepo.git_util import get_current_git_branch, is_repo_unchanged
+
 MONOREPO_CONFIG_FILE = "monorepo.yml"
 MONOREPO_SYNC_FILE = ".monorepo.sync"
 
@@ -46,17 +48,14 @@ def read_monorepo_config() -> GitMonorepoConfig:
 
     project_folder = monorepo_config_folder
 
-    current_branch = (
-        subprocess.check_output(
-            ["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=project_folder
-        )
-        .decode(encoding="utf-8")
-        .strip()
-    )
-
     config_file_name = os.path.join(project_folder, MONOREPO_CONFIG_FILE)
     with open(config_file_name, "rt") as f:
         config_data = yaml.safe_load(f)
+
+    if "branch" in config_data:
+        current_branch = config_data["branch"]
+    else:
+        current_branch = get_current_git_branch(project_folder)
 
     synchronized_commits = _read_synchronized_commits(project_folder)
 
@@ -81,6 +80,10 @@ def write_synchronized_commits(
     commit = (
         commit if commit else get_current_commit(project_folder=monorepo.project_folder)
     )
+
+    # if no changes happened in the current repo, we don't update hashes for no reason
+    if is_repo_unchanged(monorepo, repo):
+        return
 
     monorepo.synchronized_commits[repo] = [commit]
 

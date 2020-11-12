@@ -13,7 +13,7 @@ def env_extend(extra_env: Dict[str, str]) -> Dict[str, str]:
 
 
 def is_repo_unchanged(
-    monorepo: git_monorepo_config.GitMonorepoConfig, folder_name: str
+    monorepo: "git_monorepo_config.GitMonorepoConfig", folder_name: str
 ) -> bool:
     """
     We check if the sub-repo is changed. This is done via a log that could happen
@@ -44,3 +44,18 @@ def is_repo_unchanged(
             return False
 
     return True
+
+
+def get_current_git_branch(project_folder: str) -> str:
+    """
+    Gets the branch name for a folder
+    :param project_folder:
+    :return:
+    """
+    return (
+        subprocess.check_output(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=project_folder
+        )
+        .decode(encoding="utf-8")
+        .strip()
+    )
