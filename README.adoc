@@ -29,6 +29,8 @@ mappings:
     git-monorepo: git@github.com:bmustiata/git-monorepo.git
 -----------------------------------------------------------------------------
 
+=== Custom Branch
+
 If you want to use a different branch name in all the remote repositories
 instead of the same name as the local branch, specify it as such:
 
@@ -40,6 +42,19 @@ branch: master
 -----------------------------------------------------------------------------
 
 NOTE: This branch name applies for both pulling _and_ pushing.
+
+=== Squash Commits
+
+`subtree` creates the commits, including merges into the upstream repos. This
+could severely pollute the history of the upstream repos. To squash the history
+into single commits, enable squashing commits via the `squash` property:
+
+[source,yaml]
+-----------------------------------------------------------------------------
+mappings:
+  # ...
+squash: true
+-----------------------------------------------------------------------------
 
 === pull
 

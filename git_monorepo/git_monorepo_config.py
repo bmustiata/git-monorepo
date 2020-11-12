@@ -20,12 +20,14 @@ class GitMonorepoConfig:
         current_branch: str,
         synchronized_commits: Dict[str, List[str]],
         project_folder: str,
+        squash: bool,
     ) -> None:
         # maps local folder to remote git repo location
         self.repos = repos
         self.current_branch = current_branch
         self.synchronized_commits = synchronized_commits
         self.project_folder = project_folder
+        self.squash = squash
 
 
 def read_monorepo_config() -> GitMonorepoConfig:
@@ -57,6 +59,8 @@ def read_monorepo_config() -> GitMonorepoConfig:
     else:
         current_branch = get_current_git_branch(project_folder)
 
+    squash = config_data.get("squash", False)
+
     synchronized_commits = _read_synchronized_commits(project_folder)
 
     repos: Dict[str, str] = dict()
@@ -67,6 +71,7 @@ def read_monorepo_config() -> GitMonorepoConfig:
         current_branch=current_branch,
         project_folder=project_folder,
         synchronized_commits=synchronized_commits,
+        squash=squash,
     )
 
 

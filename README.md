@@ -23,6 +23,33 @@ git directory:
       tools:
         git-monorepo: git@github.com:bmustiata/git-monorepo.git
 
+Custom Branch
+-------------
+
+If you want to use a different branch name in all the remote
+repositories instead of the same name as the local branch, specify it as
+such:
+
+    mappings:
+      # ...
+    branch: master
+
+> **Note**
+>
+> This branch name applies for both pulling *and* pushing.
+
+Squash Commits
+--------------
+
+`subtree` creates the commits, including merges into the upstream repos.
+This could severely pollute the history of the upstream repos. To squash
+the history into single commits, enable squashing commits via the
+`squash` property:
+
+    mappings:
+      # ...
+    squash: true
+
 pull
 ----
 
@@ -64,5 +91,11 @@ equivalent of:
     git subtree split --rejoin --prefix=new/path HEAD
     git subtree pull --squash --prefix=new/path giturl branch
 
-WARN: You still need to manually update the `monorepo.yml` manually with
-the new location.
+> **Note**
+>
+> You still need to manually update the `monorepo.yml` manually with the
+> new location.
+
+> **Note**
+>
+> The feature is currently deemed unstable.

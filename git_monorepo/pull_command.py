@@ -69,16 +69,21 @@ def pull(
 def pull_monorepo_project(
     monorepo: GitMonorepoConfig, folder_name: str, repo_location: str
 ) -> None:
+    pull_command = [
+        "git",
+        "subtree",
+        "pull",
+        "-P",
+        folder_name,
+        repo_location,
+        monorepo.current_branch,
+    ]
+
+    if monorepo.squash:
+        pull_command.insert(3, "--squash")
+
     subprocess.check_call(
-        [
-            "git",
-            "subtree",
-            "pull",
-            "-P",
-            folder_name,
-            repo_location,
-            monorepo.current_branch,
-        ],
+        pull_command,
         cwd=monorepo.project_folder,
         env=env_extend(
             {
@@ -92,16 +97,21 @@ def pull_monorepo_project(
 def add_monorepo_project(
     monorepo: GitMonorepoConfig, folder_name: str, repo_location: str
 ) -> None:
+    add_command = [
+        "git",
+        "subtree",
+        "add",
+        "-P",
+        folder_name,
+        repo_location,
+        monorepo.current_branch,
+    ]
+
+    if monorepo.squash:
+        add_command.insert(3, "--squash")
+
     subprocess.check_call(
-        [
-            "git",
-            "subtree",
-            "add",
-            "-P",
-            folder_name,
-            repo_location,
-            monorepo.current_branch,
-        ],
+        add_command,
         cwd=monorepo.project_folder,
         env=env_extend(
             {

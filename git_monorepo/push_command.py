@@ -6,6 +6,7 @@ from git_monorepo.git_monorepo_config import (
     read_monorepo_config,
     write_synchronized_commits,
     get_current_commit,
+    GitMonorepoConfig,
 )
 from git_monorepo.git_util import is_repo_unchanged
 from git_monorepo.pull_command import env_extend
@@ -41,17 +42,24 @@ def push(resync: bool):
         write_synchronized_commits(monorepo, repo=folder_name, commit=current_commit)
 
 
-def push_monorepo_project(monorepo, folder_name, repo_location):
+def push_monorepo_project(
+    monorepo: GitMonorepoConfig, folder_name: str, repo_location: str
+) -> None:
+    push_command = [
+        "git",
+        "subtree",
+        "push",
+        "-P",
+        folder_name,
+        repo_location,
+        monorepo.current_branch,
+    ]
+
+    if monorepo.squash:
+        push_command.insert(3, "--squash")
+
     subprocess.check_call(
-        [
-            "git",
-            "subtree",
-            "push",
-            "-P",
-            folder_name,
-            repo_location,
-            monorepo.current_branch,
-        ],
+        push_command,
         cwd=monorepo.project_folder,
         env=env_extend(
             {
